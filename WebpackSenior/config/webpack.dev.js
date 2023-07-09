@@ -132,5 +132,9 @@ module.exports = {
     host: "localhost", // 启动的服务器域名
     port: "3000", // 启动的服务器端口
     open: true, // 是否自动打开浏览器
+    // 开启HotModuleReplacement（热模块替换）
+    // 只需要在开发环境下配置，生产环境下不需要
+    // 默认值为true
+    hot: true,
   },
 };
