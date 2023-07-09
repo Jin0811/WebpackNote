@@ -68,3 +68,39 @@ module: {
   ],
 },
 ```
+
+## 5 Include/Exclude
+
+开发时我们需要使用第三方的库或插件，所有文件都下载到 node_modules 中了。而这些文件是不需要编译可以直接使用的。所以我们在对 js 文件处理时，要排除 node_modules 下面的文件
+- include 包含，只处理 xxx 文件
+- exclude 排除，除了 xxx 文件以外其他文件都处理
+
+注意：include和exclude只能使用其中之一
+```js
+// 加载器 loader
+module: {
+  rules: [
+    {
+      oneOf: [
+        // babel-loader
+        {
+          test: /\.js$/,
+          exclude: /node_modules/, // 排除node_modules当中的js文件，这些文件无需处理
+          // include: path.resolve(__dirname, "../src"), // 只处理src下的文件，其他文件不作处理
+          use: {
+            loader: "babel-loader",
+          },
+        },
+      ],
+    },
+  ],
+},
+
+// 插件 plugin
+plugins: [
+  new ESLintPlugin({
+    context: path.resolve(__dirname, "../src"), // 指定需要检查的目录
+    exclude: "node_modules", // 对node_modules不作处理，默认值为node_modules
+  }),
+],
+```

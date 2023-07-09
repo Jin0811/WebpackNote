@@ -108,6 +108,7 @@ module.exports = {
           {
             test: /\.js$/,
             exclude: /node_modules/, // 排除node_modules当中的js文件，这些文件无需处理
+            // include: path.resolve(__dirname, "../src"), // 只处理src下的文件，其他文件不作处理
             use: {
               loader: "babel-loader",
             },
@@ -123,6 +124,7 @@ module.exports = {
   plugins: [
     new ESLintPlugin({
       context: path.resolve(__dirname, "../src"), // 指定需要检查的目录
+      exclude: "node_modules", // 对node_modules不作处理，默认值为node_modules
     }),
     new HtmlWebpackPlugin({
       // 指定模板文件
