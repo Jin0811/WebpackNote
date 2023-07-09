@@ -32,6 +32,9 @@ module.exports = {
   // 模式 mode
   mode: "production", // development | production
 
+  // SourceMap配置，开发模式和生产模式使用不同的配置
+  devtool: "source-map",
+
   // 入口 entry
   entry: "./src/main.js",
 

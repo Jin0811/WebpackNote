@@ -8,6 +8,9 @@ module.exports = {
   // 模式 mode
   mode: "development", // development | production
 
+  // SourceMap配置，开发模式和生产模式使用不同的配置
+  devtool: "cheap-module-source-map",
+
   // 入口 entry
   // 开发模式下，虽然webpack.dev.js在config文件当中，无法访问到./src/main.js
   // 但是执行命令的时候，我们是在根目录当中执行的，所以下面的路径是正确的，无需修改
