@@ -50,82 +50,86 @@ module.exports = {
   // 加载器 loader
   module: {
     rules: [
-      // 样式相关loader
       {
-        test: /\.css$/i, // 只检测.css文件
-        use: getStyleLoader(), // loader的执行顺序是：从右到左（从下到上），先css-loader，再style-loader
-      },
-      {
-        test: /\.less$/i,
-        // loader: "xxx",
-        use: getStyleLoader("less-loader"),
-      },
-      {
-        test: /\.s[ac]ss$/i,
-        use: getStyleLoader("sass-loader"),
-      },
-      {
-        test: /\.styl$/,
-        use: getStyleLoader("stylus-loader"),
-      },
-
-      // 处理图片资源，针对小图片进行Base64转换
-      {
-        test: /\.(png|jpe?g|webp|svg)$/,
-        type: "asset",
-        parser: {
-          dataUrlCondition: {
-            // 小于20kb的图片转换为Base64
-            // 优点：减少请求数量
-            // 缺点：体积会比之前大一些
-            maxSize: 20 * 1024,
+        oneOf: [
+          // 样式相关loader
+          {
+            test: /\.css$/i, // 只检测.css文件
+            use: getStyleLoader(), // loader的执行顺序是：从右到左（从下到上），先css-loader，再style-loader
           },
-        },
-        // 修改图片资源的输出目录和名称，如果不修改的话，全部的资源都会放在dist中，比较混乱
-        // [hash:8]: hash值取8位，[hash]默认为20位
-        // [ext]: 使用之前的文件扩展名
-        // [query]: 添加之前的query参数
-        // [name]: 资源原来的名称
-        generator: {
-          filename: "static/images/[hash:8][ext][query]",
-        },
-      },
+          {
+            test: /\.less$/i,
+            // loader: "xxx",
+            use: getStyleLoader("less-loader"),
+          },
+          {
+            test: /\.s[ac]ss$/i,
+            use: getStyleLoader("sass-loader"),
+          },
+          {
+            test: /\.styl$/,
+            use: getStyleLoader("stylus-loader"),
+          },
 
-      // 处理fonts
-      {
-        test: /\.(ttf|woff2?)$/,
-        // asset会将小于一定大小的资源转换为Base64，字体资源不需要转换
-        // 这里使用asset/resource，发送一个单独的文件并导出URL，即原封不动对文件进行输出
-        type: "asset/resource",
-        // 修改输出目录和名称
-        generator: {
-          filename: "static/media/[hash][ext][query]",
-        },
-      },
+          // 处理图片资源，针对小图片进行Base64转换
+          {
+            test: /\.(png|jpe?g|webp|svg)$/,
+            type: "asset",
+            parser: {
+              dataUrlCondition: {
+                // 小于20kb的图片转换为Base64
+                // 优点：减少请求数量
+                // 缺点：体积会比之前大一些
+                maxSize: 20 * 1024,
+              },
+            },
+            // 修改图片资源的输出目录和名称，如果不修改的话，全部的资源都会放在dist中，比较混乱
+            // [hash:8]: hash值取8位，[hash]默认为20位
+            // [ext]: 使用之前的文件扩展名
+            // [query]: 添加之前的query参数
+            // [name]: 资源原来的名称
+            generator: {
+              filename: "static/images/[hash:8][ext][query]",
+            },
+          },
 
-      // 处理其他资源，譬如：音频、视频、Excel、Word等
-      // 这些资源无需特殊处理，原封不动输出即可，此配置可以与上方的处理fonts配置项合并
-      // 为了更加清晰明了，这里单独进行了一个配置
-      {
-        test: /\.(map3|map4|avi|xlsx|doc|docx)$/,
-        // asset会将小于一定大小的资源转换为Base64，字体资源不需要转换
-        // 这里使用asset/resource，发送一个单独的文件并导出URL，即原封不动对文件进行输出
-        type: "asset/resource",
-        // 修改输出目录和名称
-        generator: {
-          filename: "static/media/[hash][ext][query]",
-        },
-      },
+          // 处理fonts
+          {
+            test: /\.(ttf|woff2?)$/,
+            // asset会将小于一定大小的资源转换为Base64，字体资源不需要转换
+            // 这里使用asset/resource，发送一个单独的文件并导出URL，即原封不动对文件进行输出
+            type: "asset/resource",
+            // 修改输出目录和名称
+            generator: {
+              filename: "static/media/[hash][ext][query]",
+            },
+          },
 
-      // babel-loader
-      {
-        test: /\.js$/,
-        exclude: /node_modules/, // 排除node_modules当中的js文件，这些文件无需处理
-        use: {
-          loader: "babel-loader",
-        },
-        // options.presets预设等配置项建议在babel.config.js文件当中进行配置，统一管理
-        // options: { presets: ["@babel/preset-env"] },
+          // 处理其他资源，譬如：音频、视频、Excel、Word等
+          // 这些资源无需特殊处理，原封不动输出即可，此配置可以与上方的处理fonts配置项合并
+          // 为了更加清晰明了，这里单独进行了一个配置
+          {
+            test: /\.(map3|map4|avi|xlsx|doc|docx)$/,
+            // asset会将小于一定大小的资源转换为Base64，字体资源不需要转换
+            // 这里使用asset/resource，发送一个单独的文件并导出URL，即原封不动对文件进行输出
+            type: "asset/resource",
+            // 修改输出目录和名称
+            generator: {
+              filename: "static/media/[hash][ext][query]",
+            },
+          },
+
+          // babel-loader
+          {
+            test: /\.js$/,
+            exclude: /node_modules/, // 排除node_modules当中的js文件，这些文件无需处理
+            use: {
+              loader: "babel-loader",
+            },
+            // options.presets预设等配置项建议在babel.config.js文件当中进行配置，统一管理
+            // options: { presets: ["@babel/preset-env"] },
+          },
+        ],
       },
     ],
   },

@@ -52,3 +52,19 @@ if (module.hot) {
   module.hot.accept("./js/sum.js");
 }
 ```
+
+## 4 oneOf
+
+在配置 loader 的时候，每一种文件只会被一个 loader 处理，但是会过一遍全部的 loader，比较慢，可以使用 oneOf 来实现匹配到一个 loader 之后，后续 loader 不再匹配的功能
+
+```js
+module: {
+  rules: [
+    {
+      oneOf: [
+        // loader配置项
+      ],
+    }
+  ],
+},
+```
