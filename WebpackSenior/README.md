@@ -71,11 +71,13 @@ module: {
 
 ## 5 Include/Exclude
 
-开发时我们需要使用第三方的库或插件，所有文件都下载到 node_modules 中了。而这些文件是不需要编译可以直接使用的。所以我们在对 js 文件处理时，要排除 node_modules 下面的文件
+开发时我们需要使用第三方的库或插件，所有文件都下载到 node_modules 中了。而这些文件是不需要 Babel 编译和 eslint 校验，可以直接使用的。所以我们在对 js 文件处理时，要排除 node_modules 下面的文件
+
 - include 包含，只处理 xxx 文件
 - exclude 排除，除了 xxx 文件以外其他文件都处理
 
-注意：include和exclude只能使用其中之一
+注意：include 和 exclude 只能使用其中之一
+
 ```js
 // 加载器 loader
 module: {
@@ -101,6 +103,45 @@ plugins: [
   new ESLintPlugin({
     context: path.resolve(__dirname, "../src"), // 指定需要检查的目录
     exclude: "node_modules", // 对node_modules不作处理，默认值为node_modules
+  }),
+],
+```
+
+## 6 Cache
+
+在每一次进行打包时，Babel 和 Eslint 都会对全部的文件进行编译和检查，这样速度比较慢，我们可以将之前编译和检查的结果进行缓存，只对修改的文件进行处理，这样可以加快打包的速度
+
+```js
+// babel开启缓存，设置cacheDirectory和cacheCompression属性
+// babel-loader
+{
+  test: /\.js$/,
+  exclude: /node_modules/, // 排除node_modules当中的js文件，这些文件无需处理
+  // include: path.resolve(__dirname, "../src"), // 只处理src下的文件，其他文件不作处理
+  use: {
+    loader: "babel-loader",
+  },
+  options: {
+    // options.presets预设等配置项建议在babel.config.js文件当中进行配置，统一管理
+    // presets: ["@babel/preset-env"]
+    cacheDirectory: true, // 开启babel缓存
+    cacheCompression: false, // 关闭缓存文件压缩，即不压缩缓存文件
+  },
+},
+
+// eslint开启缓存，在ESLintPlugin当中设置cache和cacheLocation
+// 插件 plugin
+plugins: [
+  new ESLintPlugin({
+    context: path.resolve(__dirname, "../src"), // 指定需要检查的目录
+    exclude: "node_modules", // 对node_modules不作处理，默认值为node_modules
+    cache: true, // 开启缓存
+    cacheLocation: path.resolve(__dirname, "../node_modules/.cache/eslintcache"), // 缓存目录
+  }),
+  new HtmlWebpackPlugin({
+    // 指定模板文件
+    // 新的HTML文件的特点：1、结构和模板文件一致 2、会自动引入打包输出的资源
+    template: path.resolve(__dirname, "../public/index.html"),
   }),
 ],
 ```

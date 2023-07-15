@@ -124,11 +124,16 @@ module.exports = {
             test: /\.js$/,
             exclude: /node_modules/, // 排除node_modules当中的js文件，这些文件无需处理
             // include: path.resolve(__dirname, "../src"), // 只处理src下的文件，其他文件不作处理
-            use: {
-              loader: "babel-loader",
+
+            // 注意：如果存在options，那就不能再使用use字段，而是需要使用loader字段
+            // use: { loader: "babel-loader" },
+            loader: "babel-loader",
+            options: {
+              // options.presets预设等配置项建议在babel.config.js文件当中进行配置，统一管理
+              // presets: ["@babel/preset-env"]
+              cacheDirectory: true, // 开启babel缓存
+              cacheCompression: false, // 关闭缓存文件压缩，即不压缩缓存文件
             },
-            // options.presets预设等配置项建议在babel.config.js文件当中进行配置，统一管理
-            // options: { presets: ["@babel/preset-env"] },
           },
         ],
       },
@@ -141,6 +146,8 @@ module.exports = {
     new ESLintPlugin({
       context: path.resolve(__dirname, "../src"), // 指定需要检查的目录
       exclude: "node_modules", // 对node_modules不作处理，默认值为node_modules
+      cache: true, // 开启缓存
+      cacheLocation: path.resolve(__dirname, "../node_modules/.cache/eslintcache"), // 缓存目录
     }),
     // HTML自动引入打包后的资源
     new HtmlWebpackPlugin({
