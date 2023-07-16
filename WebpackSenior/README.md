@@ -305,3 +305,41 @@ webpack 当中有一个优化方案是对静态资源进行缓存，即某些静
 - 上面我们解决了发布新版本，浏览器还是读取缓存的问题，现在有了一个新的问题，假如 main.js 当中依赖了 math.js，我们想实现，修改 math.js 时，其他文件继续走缓存，只有 math.js 请求新的，但是目前 main.js 依赖了 math.js，math.js 的 hash 发生了变化，那 main.js 也会发生变化，一个文件的改动，造成了全部文件的改动
 
   > 为了解决这个问题，我们引入了 runtimeChunk 的概念，即我们把文件的依赖关系和 hash 值存储在一个 runtime 中，这样 math.js 发生变化时，只有 math.js 和 runtime 这两个文件才会发生变化，而 runtime 体积很小，发生变化造成的损耗并不大
+
+## 12 Core-js
+
+过去我们使用 babel 对 js 代码进行了兼容性处理，其中使用@babel/preset-env 智能预设来处理兼容性问题。它能将 ES6 的一些语法进行编译转换，比如箭头函数、扩展运算符等。但是如果是 async 函数、promise 对象、数组的一些方法（includes）等，它没办法处理。所以此时我们 js 代码仍然存在兼容性问题，一旦遇到低版本浏览器会直接报错。所以我们想要将 js 兼容性问题彻底解决
+
+core-js 是专门用来做 ES6 以及以上 API 的 polyfill，polyfill 翻译过来叫做垫片/补丁。就是用社区上提供的一段代码，让我们在不兼容某些新特性的浏览器上，使用该新特性
+
+针对 core-js，我们有三种引入方式：
+
+- 全部导入
+
+  ```js
+  // main.js
+  import "core-js";
+  ```
+
+- 手动按需导入
+
+  ```js
+  // main.js
+  import "core-js/es/promise";
+  ```
+
+- 自动按需导入
+
+  ```js
+  // babel.config.js
+  module.exports = {
+    // 智能预设：能够编译ES6语法
+    presets: [
+      [
+        "@babel/preset-env",
+        // 按需加载core-js的polyfill
+        { useBuiltIns: "usage", corejs: { version: "3", proposals: true } },
+      ],
+    ],
+  };
+  ```

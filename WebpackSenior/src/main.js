@@ -37,3 +37,15 @@ document.getElementById("btn").onclick = function () {
       console.log("模块动态加载失败", err);
     });
 };
+
+// 目前使用了babel来进行了ES6代码的转换，但是对于promise等新特性，babel无法进行处理，此时就需要配置相关polyfill
+const pInstance = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    resolve(123);
+  }, 1000);
+});
+pInstance.then((res) => {
+  console.log(res);
+}).catch((err) => {
+  console.log(err);
+});
