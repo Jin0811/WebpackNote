@@ -217,3 +217,14 @@ optimization: {
   ],
 }
 ```
+
+## 8 Tree Shaking
+
+在项目的开发过程当中，我们可能引入了一些第三方库，或者是自定义的一些工具库，我们只用到了其中一部分的代码，但是打包的时候，却把整个库都打包进来了，体积会变得很大，我们可以借助 Tree Shaking 来进行体积的优化
+
+Tree Shaking 是一个术语，通常用于描述移除 JavaScript 中的没有使用上的代码
+
+注意：
+
+- Tree Shaking 依赖 ES Module
+- webpack 内置了 Tree Shaking，无需进行配置
