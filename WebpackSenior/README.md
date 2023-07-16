@@ -145,3 +145,75 @@ plugins: [
   }),
 ],
 ```
+
+## 7 多进程打包
+
+当项目越来越庞大的时候，打包速度也会变得很慢，比较浪费时间，我们需要去通过优化配置来提升打包速度。项目当中 JS 文件是最多的，提高 JS 的打包速度也就是需要优化 Eslint、Babel、Terser。我们可以开启多个进程去处理 JS 文件，提高打包速度
+
+多进程打包：开启电脑的多个进程同时干一件事情，速度更快
+
+注意：请仅在特别耗时的操作中使用，因为每个进程启动就有大约 600ms 的开销！
+
+```js
+// 需要安装thread-loader
+npm i thread-loader -D
+
+// 获取CPU的核数的例子
+const os = require("os");
+const threads = os.cpus().length;
+
+// babel开启多进程打包，配置thread-loader
+// babel-loader
+{
+  test: /\.js$/,
+  exclude: /node_modules/, // 排除node_modules当中的js文件，这些文件无需处理
+  // include: path.resolve(__dirname, "../src"), // 只处理src下的文件，其他文件不作处理
+  use: [
+    // thread-loader开启多进程打包
+    {
+      loader: "thread-loader",
+      options: {
+        works: threads, // 进程数量，设置进程数量，有多少个CPU就开启几个进程
+      },
+    },
+    {
+      loader: "babel-loader",
+      options: {
+        // options.presets预设等配置项建议在babel.config.js文件当中进行配置，统一管理
+        // presets: ["@babel/preset-env"]
+        cacheDirectory: true, // 开启babel缓存
+        cacheCompression: false, // 关闭缓存文件压缩，即不压缩缓存文件
+      },
+    },
+  ],
+},
+
+// eslint开启多线程打包，设置threads属性
+// Eslint
+new ESLintPlugin({
+  context: path.resolve(__dirname, "../src"), // 指定需要检查的目录
+  exclude: "node_modules", // 对node_modules不作处理，默认值为node_modules
+  cache: true, // 开启缓存
+  cacheLocation: path.resolve(
+    __dirname,
+    "../node_modules/.cache/eslintcache"
+  ), // 缓存目录
+  threads, // 开启eslint的多进程打包，设置进程数量
+}),
+
+// 开启多进程代码压缩
+// 注意：
+// 1 开发模式下无需对代码进行压缩，也就不存在了配置开启多进程压缩
+// 2 optimization.minimizer当中的插件也可以放到plugins当中，但是建议压缩类的配置放在optimization.minimizer当中，统一管理
+optimization: {
+  minimizer: [
+    // 压缩CSS
+    new CssMinimizerPlugin(),
+    // 压缩JS，使用webpack内置的压缩代码插件
+    // TerserPlugin插件在生产模式下打包时，会自动调用，压缩代码，这里手动调用是为了传递参数，开启多进程打包
+    new TerserPlugin({
+      parallel: threads, // 开启多进程压缩代码，设置进程数量
+    }),
+  ],
+}
+```

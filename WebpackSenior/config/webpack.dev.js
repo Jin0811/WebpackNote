@@ -1,8 +1,11 @@
 const path = require("path");
+const os = require("os");
 
 // Plugins
 const ESLintPlugin = require("eslint-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+
+const threads = os.cpus().length; // 获取CPU的核数
 
 module.exports = {
   // 模式 mode
@@ -109,16 +112,26 @@ module.exports = {
             test: /\.js$/,
             exclude: /node_modules/, // 排除node_modules当中的js文件，这些文件无需处理
             // include: path.resolve(__dirname, "../src"), // 只处理src下的文件，其他文件不作处理
-
-            // 注意：如果存在options，那就不能再使用use字段，而是需要使用loader字段
-            // use: { loader: "babel-loader" },
-            loader: "babel-loader",
-            options: {
-              // options.presets预设等配置项建议在babel.config.js文件当中进行配置，统一管理
-              // presets: ["@babel/preset-env"]
-              cacheDirectory: true, // 开启babel缓存
-              cacheCompression: false, // 关闭缓存文件压缩，即不压缩缓存文件
-            },
+            use: [
+              // thread-loader开启多进程打包
+              {
+                loader: "thread-loader",
+                options: {
+                  works: threads, // 进程数量，设置进程数量，有多少个CPU就开启几个进程
+                },
+              },
+              {
+                loader: "babel-loader",
+                options: {
+                  // options.presets预设等配置项建议在babel.config.js文件当中进行配置，统一管理
+                  // presets: ["@babel/preset-env"]
+                  cacheDirectory: true, // 开启babel缓存
+                  // cacheCompression 默认为 true，将缓存内容压缩为 gz 包以减⼩缓存⽬录的体积。在设为 false 的情况下将跳过压缩和解压的过程，从⽽提升这⼀阶段的速度
+                  // 即不对babel的文件进行压缩，这样虽然会占用多一点的电脑空间，但是提升了速度
+                  cacheCompression: false,
+                },
+              },
+            ],
           },
         ],
       },
@@ -131,7 +144,11 @@ module.exports = {
       context: path.resolve(__dirname, "../src"), // 指定需要检查的目录
       exclude: "node_modules", // 对node_modules不作处理，默认值为node_modules
       cache: true, // 开启缓存
-      cacheLocation: path.resolve(__dirname, "../node_modules/.cache/eslintcache"), // 缓存目录
+      cacheLocation: path.resolve(
+        __dirname,
+        "../node_modules/.cache/eslintcache"
+      ), // 缓存目录
+      threads, // 开启eslint的多进程打包，设置进程数量
     }),
     new HtmlWebpackPlugin({
       // 指定模板文件
