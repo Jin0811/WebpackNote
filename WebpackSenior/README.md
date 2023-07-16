@@ -269,3 +269,27 @@ npm i @babel/plugin-transform-runtime -D
   ],
 },
 ```
+
+## 10 图片压缩 image-minimizer-webpack-plugin
+
+可以对项目当中的静态资源图片进行压缩，这样会减小图片的体积，从而减小打包的体积
+
+注意：
+
+- 使用此插件，还需要配合两个软件：`jpegtran.exe` 和 `optipng.exe`，默认情况下无需手动下载，手动放到 `node_modules` 当中，但是有的时候下载不成功，就需要手动去官网下载，再放到 `node_modules` 当中
+- 压缩针对的只是项目内的静态图片，如果使用的都是网络链接形式的图片，就无需配置此插件
+- 这里需要的几个 npm 包比较难下载，还需要配合软件，如果图片不是很多的话，我们也可以提前借助一些网站和软件对图片进行压缩，就无需配置此插件了
+
+```js
+// 安装用来压缩图片的插件
+npm i image-minimizer-webpack-plugin imagemin -D
+
+// 无损压缩
+npm install imagemin-gifsicle imagemin-jpegtran imagemin-optipng imagemin-svgo -D
+
+// 有损压缩
+npm install imagemin-gifsicle imagemin-mozjpeg imagemin-pngquant imagemin-svgo -D
+
+// 详细配置请参考
+https://yk2012.github.io/sgg_webpack5/senior/reduceVolume.html#image-minimizer
+```
