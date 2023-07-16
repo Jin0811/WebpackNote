@@ -4,9 +4,11 @@ module.exports = {
     node: true, // 启用node中全局变量
     browser: true, // 启用浏览器中全局变量
   },
+  parser: "babel-eslint", // 指定解析器
   parserOptions: {
     ecmaVersion: 6, // 支持的 ECMAScript 版本
     sourceType: "module", // JS源代码的类型，"module"用于ECMAScript模块(ESM)
+    allowImportExportEverywhere: true, // 允许import和export出现在任何地方
   },
   rules: {
     /**
