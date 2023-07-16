@@ -206,5 +206,8 @@ module.exports = {
         parallel: threads, // 开启多进程压缩代码，设置进程数量
       }),
     ],
+    splitChunks: {
+      chunks: "all", // 对所有模块都进行分割
+    },
   },
 };

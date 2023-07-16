@@ -171,6 +171,12 @@ module.exports = {
     }),
   ],
 
+  optimization: {
+    splitChunks: {
+      chunks: "all", // 对所有模块都进行分割
+    },
+  },
+
   // webpack-dev-server配置开发服务器，不会输出资源，是在内存当中进行编译打包的
   devServer: {
     host: "localhost", // 启动的服务器域名
