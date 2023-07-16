@@ -121,6 +121,7 @@ module.exports = {
       // 指定模板文件
       // 新的HTML文件的特点：1、结构和模板文件一致 2、会自动引入打包输出的资源
       template: path.resolve(__dirname, "../public/index.html"),
+      title: "WebpackBase", // HTML文档的标题
     }),
   ],
 
