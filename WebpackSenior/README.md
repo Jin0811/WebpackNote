@@ -228,3 +228,44 @@ Tree Shaking 是一个术语，通常用于描述移除 JavaScript 中的没有�
 
 - Tree Shaking 依赖 ES Module
 - webpack 内置了 Tree Shaking，无需进行配置
+
+## 9 Babel
+
+默认情况下，babel 会为每一个需要它的文件里面引入一些辅助代码，这会导致文件体积的增大，我们可以将这些辅助代码作为一个独立模块，来避免重复引入
+
+`@babel/plugin-transform-runtime` 禁用了 Babel 自动对每个文件的 runtime 注入，而是引入 `@babel/plugin-transform-runtime` 并且使所有辅助代码从这里引用
+
+注意：此配置可以在开发和生产环境下配置
+
+```js
+// 安装
+npm i @babel/plugin-transform-runtime -D
+
+// babel-loader
+{
+  test: /\.js$/,
+  exclude: /node_modules/, // 排除node_modules当中的js文件，这些文件无需处理
+  // include: path.resolve(__dirname, "../src"), // 只处理src下的文件，其他文件不作处理
+  use: [
+    // thread-loader开启多进程打包
+    {
+      loader: "thread-loader",
+      options: {
+        works: threads, // 进程数量，设置进程数量，有多少个CPU就开启几个进程
+      },
+    },
+    {
+      loader: "babel-loader",
+      options: {
+        // options.presets预设等配置项建议在babel.config.js文件当中进行配置，统一管理
+        // presets: ["@babel/preset-env"]
+        cacheDirectory: true, // 开启babel缓存
+        // cacheCompression 默认为 true，将缓存内容压缩为 gz 包以减⼩缓存⽬录的体积。在设为 false 的情况下将跳过压缩和解压的过程，从⽽提升这⼀阶段的速度
+        // 即不对babel的文件进行压缩，这样虽然会占用多一点的电脑空间，但是提升了速度
+        cacheCompression: false,
+        plugins: ["@babel/plugin-transform-runtime"], // 减少代码体积
+      },
+    },
+  ],
+},
+```
