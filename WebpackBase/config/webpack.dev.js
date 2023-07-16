@@ -17,7 +17,18 @@ module.exports = {
   // 输出 output
   output: {
     path: undefined, // 开发模块下没有输出，不需要配置path
-    filename: "static/js/main.js", // 输出的文件名称，这里修改了入口js文件的存放目录
+    filename: "static/js/[name].js", // 输出的文件名称，这里修改了入口js文件的存放目录
+
+    // /* webpackChunkName: "count" */ 是webpack的魔法命名，可以为动态导入的模块命名
+    // 此外还需要在webpack配置文件当中添加以下配置：
+    // output.chunkFilename: "static/js/[name].chunk.js"
+    // 添加.chunk是为了更好的区分哪些是动态文件
+    chunkFilename: "static/js/[name].chunk.js",
+
+    // 对type: asset的文件（图片、字体、音频、视频、Excel、Word等）统一命名
+    // 这样就不需要在下面每个loader当中配置了，统一都放在了 static/media 目录当中
+    assetModuleFilename: "static/media/[hash:8][ext][query]",
+
     clean: true, // 在每次构建前清理/dist文件夹，即每次打包的时候，将output.path目录清空
   },
 
@@ -68,9 +79,10 @@ module.exports = {
         // [ext]: 使用之前的文件扩展名
         // [query]: 添加之前的query参数
         // [name]: 资源原来的名称
-        generator: {
-          filename: "static/images/[hash:8][ext][query]",
-        },
+        // 已使用 assetModuleFilename 进行了统一命名
+        // generator: {
+        //   filename: "static/images/[hash:8][ext][query]",
+        // },
       },
 
       // 处理fonts
@@ -80,9 +92,10 @@ module.exports = {
         // 这里使用asset/resource，发送一个单独的文件并导出URL，即原封不动对文件进行输出
         type: "asset/resource",
         // 修改输出目录和名称
-        generator: {
-          filename: "static/media/[hash][ext][query]",
-        },
+        // 已使用 assetModuleFilename 进行了统一命名
+        // generator: {
+        //   filename: "static/media/[hash:8][ext][query]",
+        // },
       },
 
       // 处理其他资源，譬如：音频、视频、Excel、Word等
@@ -94,9 +107,10 @@ module.exports = {
         // 这里使用asset/resource，发送一个单独的文件并导出URL，即原封不动对文件进行输出
         type: "asset/resource",
         // 修改输出目录和名称
-        generator: {
-          filename: "static/media/[hash][ext][query]",
-        },
+        // 已使用 assetModuleFilename 进行了统一命名
+        // generator: {
+        //   filename: "static/media/[hash:8][ext][query]",
+        // },
       },
 
       // babel-loader
