@@ -162,4 +162,10 @@ module.exports = {
     // 压缩CSS
     new CssMinimizerPlugin(),
   ],
+
+  optimization: {
+    splitChunks: {
+      chunks: "all", // 对所有模块都进行分割
+    },
+  },
 };
