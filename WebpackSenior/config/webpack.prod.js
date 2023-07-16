@@ -47,13 +47,17 @@ module.exports = {
     // 文件的输出路径，借助path，编写绝对路径
     // __dirname是node当中的变量，代表当前文件的文件夹根目录
     path: path.resolve(__dirname, "../dist"),
-    filename: "static/js/[name].js", // 输出的文件名称，这里修改了入口js文件的存放目录
+
+    // contenthash根据文件内容生成 hash 值，只有文件内容变化了，hash 值才会变化。所有文件 hash 值是独享且不同的
+    // 使用contenthash可以实现，在进行静态资源缓存的时候，我们发布了新的版本后，浏览器可以进行更新
+    // 如果使用不使用contenthash，那每次的打包之后的入口文件都是main.js，浏览器每次都会去读取缓存
+    filename: "static/js/[name].[contenthash:8].js", // 输出的文件名称，这里修改了入口js文件的存放目录
 
     // /* webpackChunkName: "count" */ 是webpack的魔法命名，可以为动态导入的模块命名
     // 此外还需要在webpack配置文件当中添加以下配置：
     // output.chunkFilename: "static/js/[name].chunk.js"
     // 添加.chunk是为了更好的区分哪些是动态文件
-    chunkFilename: "static/js/[name].chunk.js",
+    chunkFilename: "static/js/[name].[contenthash:8].chunk.js",
 
     // 对type: asset的文件（图片、字体、音频、视频、Excel、Word等）统一命名
     // 这样就不需要在下面每个loader当中配置了，统一都放在了 static/media 目录当中
@@ -189,8 +193,8 @@ module.exports = {
     }),
     // 提取CSS成单独文件
     new MiniCssExtractPlugin({
-      filename: "static/css/[name].css",
-      chunkFilename: "static/css/[name].chunk.css", // 对动态导出的CSS文件进行命名
+      filename: "static/css/[name].[contenthash:8].css",
+      chunkFilename: "static/css/[name].[contenthash:8].chunk.css", // 对动态导出的CSS文件进行命名
     }),
   ],
 
@@ -208,6 +212,10 @@ module.exports = {
     ],
     splitChunks: {
       chunks: "all", // 对所有模块都进行分割
+    },
+    // 提取runtime文件
+    runtimeChunk: {
+      name: (entrypoint) => `runtime~${entrypoint.name}`, // runtime文件命名规则
     },
   },
 };

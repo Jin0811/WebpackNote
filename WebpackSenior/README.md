@@ -293,3 +293,15 @@ npm install imagemin-gifsicle imagemin-mozjpeg imagemin-pngquant imagemin-svgo -
 // 详细配置请参考
 https://yk2012.github.io/sgg_webpack5/senior/reduceVolume.html#image-minimizer
 ```
+
+## 11 Network Cache
+
+webpack 当中有一个优化方案是对静态资源进行缓存，即某些静态资源如果没有发生变化，就直接读取浏览器的缓存，这样就提高了访问速度，减少了对带宽的要求，但是这带来了两个新的问题：
+
+- 如果每次都读取缓存，那我们发布了新的版本，打包之后的入口文件还是 main.js，浏览器会认为文件没有发生变化，从而继续读取缓存，这样就没办法拿到最新的代码
+
+  > 解决方案：为文件名称添加上 hash 值，我们可以为每个文件添加一个基于内容的 hash，这样的话，我们修改了内容，再次打包就会生成一个不同的 hash 值，浏览器发现文件名称不一致，也就不会再读取缓存了
+
+- 上面我们解决了发布新版本，浏览器还是读取缓存的问题，现在有了一个新的问题，假如 main.js 当中依赖了 math.js，我们想实现，修改 math.js 时，其他文件继续走缓存，只有 math.js 请求新的，但是目前 main.js 依赖了 math.js，math.js 的 hash 发生了变化，那 main.js 也会发生变化，一个文件的改动，造成了全部文件的改动
+
+  > 为了解决这个问题，我们引入了 runtimeChunk 的概念，即我们把文件的依赖关系和 hash 值存储在一个 runtime 中，这样 math.js 发生变化时，只有 math.js 和 runtime 这两个文件才会发生变化，而 runtime 体积很小，发生变化造成的损耗并不大
