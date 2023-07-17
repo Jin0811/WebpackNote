@@ -338,8 +338,28 @@ core-js 是专门用来做 ES6 以及以上 API 的 polyfill，polyfill 翻译�
       [
         "@babel/preset-env",
         // 按需加载core-js的polyfill
-        { useBuiltIns: "usage", corejs: { version: "3", proposals: true } },
+        {
+          // 需要兼容的浏览器配置已经在package.json当中进行了配置，这里就无需配置了
+          // 这里为了演示core-js的兼容性处理，设置需要兼容ie10浏览器
+          // targets: { chrome: "88", ie: "10" },
+          useBuiltIns: "usage",
+          corejs: {
+            version: "3",
+            proposals: true,
+          },
+        },
       ],
     ],
   };
   ```
+
+注意：
+当我们安装了 core-js，在 babel.config.js 当中进行了自动按需导入之后，我们再次进行打包，会发现 dist 当中并没有多出来一个 polyfill 文件，这是因为我们没有设置需要兼容的浏览器版本，babel 和 core-js 在进行代码处理的时候，认为项目不需要兼容很老的浏览器，就不会再引入对应的 polyfill
+
+我们可以在多个地方配置需要兼容的浏览器版本：
+
+- 在 package.json 当中配置 browserslist 字段
+- 在 babel.config.js 的@babel/preset-env 当中，即 useBuiltIns 的上方，配置 targets 字段
+
+注意：
+如果有了 babel.config.js，则需要把 webpack.config.js 当中的 babel-loader 的 option 当中的 presets 注释掉，不注释掉的话，babel-loader 当中的 presets 会覆盖 babel.config.js 当中的 presets
