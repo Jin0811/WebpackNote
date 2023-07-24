@@ -37,7 +37,20 @@ const getStyleLoader = (preLoader) => {
         },
       },
     },
-    preLoader,
+    preLoader && {
+      loader: preLoader,
+      options:
+        // antd自定义主题
+        // main.js当中需要引入less的样式文件
+        preLoader === "less-loader"
+          ? {
+              lessOptions: {
+                modifyVars: { "@primary-color": "#8e44ad" },
+                javascriptEnabled: true,
+              },
+            }
+          : {},
+    },
   ].filter(Boolean);
 };
 
@@ -155,22 +168,24 @@ module.exports = {
       title: "ReactCli", // HTML文档的标题
     }),
     // 提取CSS成单独文件
-    isProduction && new MiniCssExtractPlugin({
-      filename: "static/css/[name].[contenthash:10].css",
-      chunkFilename: "static/css/[name].[contenthash:10].chunk.css", // 对动态导出的CSS文件进行命名
-    }),
+    isProduction &&
+      new MiniCssExtractPlugin({
+        filename: "static/css/[name].[contenthash:10].css",
+        chunkFilename: "static/css/[name].[contenthash:10].chunk.css", // 对动态导出的CSS文件进行命名
+      }),
     // 将public下面的资源复制到dist目录去（除了index.html）
-    isProduction && new CopyPlugin({
-      patterns: [
-        {
-          from: path.resolve(__dirname, "../public"),
-          to: path.resolve(__dirname, "../dist"),
-          globOptions: {
-            ignore: ["**/index.html"], // 忽略文件，index.html不需要复制过去
+    isProduction &&
+      new CopyPlugin({
+        patterns: [
+          {
+            from: path.resolve(__dirname, "../public"),
+            to: path.resolve(__dirname, "../dist"),
+            globOptions: {
+              ignore: ["**/index.html"], // 忽略文件，index.html不需要复制过去
+            },
           },
-        },
-      ],
-    }),
+        ],
+      }),
     !isProduction && new ReactRefreshWebpackPlugin(), // 处理JS的HMR功能
   ].filter(Boolean),
 
@@ -184,6 +199,29 @@ module.exports = {
     ],
     splitChunks: {
       chunks: "all", // 对所有模块都进行分割
+      cacheGroups: {
+        // 如果项目中使用antd，此时将所有node_modules打包在一起，那么打包输出文件会比较大。
+        // 所以我们将node_modules中比较大的模块单独打包，从而并行加载速度更好
+        // 如果项目中没有用到相关的库，请删除与此库相关的配置
+        antd: {
+          name: "chunk-antd",
+          test: /[\\/]node_modules[\\/]antd(.*)/,
+          priority: 30,
+        },
+        // 将react相关的库单独打包，减少node_modules的chunk体积。
+        react: {
+          name: "react",
+          test: /[\\/]node_modules[\\/]react(.*)?[\\/]/,
+          chunks: "initial",
+          priority: 20,
+        },
+        libs: {
+          name: "chunk-libs",
+          test: /[\\/]node_modules[\\/]/,
+          priority: 10, // 权重最低，优先考虑前面内容
+          chunks: "initial",
+        },
+      },
     },
     // 提取runtime文件
     runtimeChunk: {
@@ -207,4 +245,6 @@ module.exports = {
     hot: true,
     historyApiFallback: true, // 解决react-router刷新404问题
   },
+
+  performance: false, // 关闭性能分析，提升速度
 };
