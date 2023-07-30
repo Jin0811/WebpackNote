@@ -139,7 +139,7 @@ module.exports = {
       // 指定模板文件
       // 新的HTML文件的特点：1、结构和模板文件一致 2、会自动引入打包输出的资源
       template: path.resolve(__dirname, "../public/index.html"),
-      title: "ReactCli", // HTML文档的标题
+      title: "VueCli", // HTML文档的标题
     }),
     // vue项目当中处理样式
     new VueLoaderPlugin(),
@@ -163,7 +163,7 @@ module.exports = {
 
   // webpack解析模块的时候加载的选项
   resolve: {
-    extensions: [".vue", ".js", ".json"], // 自动补全文件扩展名
+    extensions: [".vue", ".js", ".json", ".vue"], // 自动补全文件扩展名
   },
 
   // webpack-dev-server配置开发服务器，不会输出资源，是在内存当中进行编译打包的

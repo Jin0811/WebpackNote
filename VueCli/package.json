@@ -6,7 +6,9 @@
   "scripts": {
     "start": "npm run dev",
     "dev": "cross-env NODE_ENV=development webpack serve --config ./config/webpack.dev.js",
-    "build": "cross-env NODE_ENV=production webpack --config ./config/webpack.prod.js"
+    "build": "cross-env NODE_ENV=production webpack --config ./config/webpack.prod.js",
+    "devByMergeConfig": "cross-env NODE_ENV=development webpack serve --config ./config/webpack.config.js",
+    "buildByMergeConfig": "cross-env NODE_ENV=production webpack --config ./config/webpack.config.js"
   },
   "keywords": [],
   "author": "",

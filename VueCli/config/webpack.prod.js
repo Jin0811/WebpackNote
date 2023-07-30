@@ -7,6 +7,8 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
+const { VueLoaderPlugin } = require("vue-loader");
+const { DefinePlugin } = require("webpack");
 
 // 封装一个方法，用于抽取样式loader当中公共的部分，简化配置项
 const getStyleLoader = (preLoader) => {
@@ -50,71 +52,72 @@ module.exports = {
 
   module: {
     rules: [
+      // 处理CSS
       {
-        oneOf: [
-          // 处理CSS
-          {
-            test: /\.css$/i, // 只检测.css文件
-            use: getStyleLoader(),
+        test: /\.css$/i, // 只检测.css文件
+        use: getStyleLoader(),
+      },
+      {
+        test: /\.less$/i,
+        use: getStyleLoader("less-loader"),
+      },
+      {
+        test: /\.s[ac]ss$/i,
+        use: getStyleLoader("sass-loader"),
+      },
+      {
+        test: /\.styl$/,
+        use: getStyleLoader("stylus-loader"),
+      },
+      // 处理图片
+      {
+        test: /\.(png|jpe?g|webp|svg)$/,
+        type: "asset",
+        parser: {
+          dataUrlCondition: {
+            maxSize: 10 * 1024, // 小于10kb的图片转换为Base64
           },
+        },
+      },
+      // 处理fonts
+      {
+        test: /\.(ttf|woff2?)$/,
+        // asset会将小于一定大小的资源转换为Base64，字体资源不需要转换
+        // 这里使用asset/resource，发送一个单独的文件并导出URL，即原封不动对文件进行输出
+        type: "asset/resource",
+      },
+      // 处理其他资源，譬如：音频、视频、Excel、Word等
+      // 这些资源无需特殊处理，原封不动输出即可，此配置可以与上方的处理fonts配置项合并
+      // 为了更加清晰明了，这里单独进行了一个配置
+      {
+        test: /\.(map3|map4|avi|xlsx|doc|docx)$/,
+        // asset会将小于一定大小的资源转换为Base64，但是有些资源不需要转换
+        // 这里使用asset/resource，发送一个单独的文件并导出URL，即原封不动对文件进行输出
+        type: "asset/resource",
+      },
+      // 处理JS babel-loader
+      {
+        test: /\.js?$/,
+        exclude: /node_modules/, // 排除node_modules当中的js文件，这些文件无需处理
+        // include: path.resolve(__dirname, "../src"), // 只处理src下的文件，其他文件不作处理
+        use: [
           {
-            test: /\.less$/i,
-            use: getStyleLoader("less-loader"),
-          },
-          {
-            test: /\.s[ac]ss$/i,
-            use: getStyleLoader("sass-loader"),
-          },
-          {
-            test: /\.styl$/,
-            use: getStyleLoader("stylus-loader"),
-          },
-          // 处理图片
-          {
-            test: /\.(png|jpe?g|webp|svg)$/,
-            type: "asset",
-            parser: {
-              dataUrlCondition: {
-                maxSize: 10 * 1024, // 小于10kb的图片转换为Base64
-              },
+            loader: "babel-loader",
+            options: {
+              // options.presets预设等配置项建议在babel.config.js文件当中进行配置，统一管理
+              // presets: ["@babel/preset-env"]
+              cacheDirectory: true, // 开启babel缓存
+              // cacheCompression 默认为 true，将缓存内容压缩为 gz 包以减⼩缓存⽬录的体积。在设为 false 的情况下将跳过压缩和解压的过程，从⽽提升这⼀阶段的速度
+              // 即不对babel的文件进行压缩，这样虽然会占用多一点的电脑空间，但是提升了速度
+              cacheCompression: false,
             },
           },
-          // 处理fonts
-          {
-            test: /\.(ttf|woff2?)$/,
-            // asset会将小于一定大小的资源转换为Base64，字体资源不需要转换
-            // 这里使用asset/resource，发送一个单独的文件并导出URL，即原封不动对文件进行输出
-            type: "asset/resource",
-          },
-          // 处理其他资源，譬如：音频、视频、Excel、Word等
-          // 这些资源无需特殊处理，原封不动输出即可，此配置可以与上方的处理fonts配置项合并
-          // 为了更加清晰明了，这里单独进行了一个配置
-          {
-            test: /\.(map3|map4|avi|xlsx|doc|docx)$/,
-            // asset会将小于一定大小的资源转换为Base64，但是有些资源不需要转换
-            // 这里使用asset/resource，发送一个单独的文件并导出URL，即原封不动对文件进行输出
-            type: "asset/resource",
-          },
-          // 处理JS babel-loader
-          {
-            test: /\.jsx?$/,
-            exclude: /node_modules/, // 排除node_modules当中的js文件，这些文件无需处理
-            // include: path.resolve(__dirname, "../src"), // 只处理src下的文件，其他文件不作处理
-            use: [
-              {
-                loader: "babel-loader",
-                options: {
-                  // options.presets预设等配置项建议在babel.config.js文件当中进行配置，统一管理
-                  // presets: ["@babel/preset-env"]
-                  cacheDirectory: true, // 开启babel缓存
-                  // cacheCompression 默认为 true，将缓存内容压缩为 gz 包以减⼩缓存⽬录的体积。在设为 false 的情况下将跳过压缩和解压的过程，从⽽提升这⼀阶段的速度
-                  // 即不对babel的文件进行压缩，这样虽然会占用多一点的电脑空间，但是提升了速度
-                  cacheCompression: false,
-                },
-              },
-            ],
-          },
         ],
+      },
+      // vue-loader不支持oneOf
+      {
+        test: /\.vue$/,
+        loader: "vue-loader", // 内部会给vue文件注入HMR功能代码
       },
     ],
   },
@@ -135,7 +138,7 @@ module.exports = {
       // 指定模板文件
       // 新的HTML文件的特点：1、结构和模板文件一致 2、会自动引入打包输出的资源
       template: path.resolve(__dirname, "../public/index.html"),
-      title: "ReactCli", // HTML文档的标题
+      title: "VueCli", // HTML文档的标题
     }),
     // 提取CSS成单独文件
     new MiniCssExtractPlugin({
@@ -153,6 +156,14 @@ module.exports = {
           },
         },
       ],
+    }),
+    // vue项目当中处理样式
+    new VueLoaderPlugin(),
+    // 解决vue项目控制台警告，定义相关环境变量，这些变量用于代码当中
+    // cross-env定义的变量是给webpack使用的，代码当中无法使用
+    new DefinePlugin({
+      __VUE_OPTIONS_API__: true,
+      __VUE_PROD_DEVTOOLS__: false,
     }),
   ],
 
@@ -174,6 +185,6 @@ module.exports = {
 
   // webpack解析模块的时候加载的选项
   resolve: {
-    extensions: [".jsx", ".js", ".json"], // 自动补全文件扩展名
+    extensions: [".jsx", ".js", ".json", ".vue"], // 自动补全文件扩展名
   },
 };
