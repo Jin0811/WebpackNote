@@ -1,6 +1,7 @@
 <template>
   <div>
     <h2>Home</h2>
+    <el-button type="success">Home</el-button>
   </div>
 </template>
 
