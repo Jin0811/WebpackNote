@@ -19,7 +19,7 @@ npm i babel-preset-react-app@10.0.1 -D
 npm i eslint-config-react-app@7.0.1 -D
 npm i webpack-dev-server@4.9.0 -D
 npm i webpack@5.72.0 -D
-npm i webpack-cli@4.9.2 -D
+npm i webpack-cli@4.10.0 -D
 npm i cross-env@7.0.3 --save-dev
 npm i @pmmmwh/react-refresh-webpack-plugin@0.5.5 -D
 npm i react-refresh@0.13.0 -D
