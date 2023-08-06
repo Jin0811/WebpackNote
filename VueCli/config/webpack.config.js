@@ -31,7 +31,16 @@ const getStyleLoader = (preLoader) => {
         },
       },
     },
-    preLoader,
+    preLoader && {
+      loader: preLoader,
+      options:
+        preLoader === "sass-loader"
+          ? {
+              // 使用 scss.additionalData 来编译所有应用 scss 变量的组件
+              additionalData: `@use "@/styles/element/index.scss" as *;`,
+            }
+          : {},
+    },
   ].filter(Boolean);
 };
 
@@ -124,6 +133,13 @@ module.exports = {
       {
         test: /\.vue$/,
         loader: "vue-loader", // 内部会给vue文件注入HMR功能代码
+        options: {
+          // 开启缓存
+          cacheDirectory: path.resolve(
+            __dirname,
+            "node_modules/.cache/vue-loader"
+          ),
+        },
       },
     ],
   },
@@ -185,6 +201,29 @@ module.exports = {
     ],
     splitChunks: {
       chunks: "all", // 对所有模块都进行分割
+      cacheGroups: {
+        // 如果项目中使用element-plus，此时将所有node_modules打包在一起，那么打包输出文件会比较大。
+        // 所以我们将node_modules中比较大的模块单独打包，从而并行加载速度更好
+        // 如果项目中没有，请删除
+        elementUI: {
+          name: "chunk-elementPlus",
+          test: /[\\/]node_modules[\\/]_?element-plus(.*)/,
+          priority: 30,
+        },
+        // 将vue相关的库单独打包，减少node_modules的chunk体积。
+        vue: {
+          name: "vue",
+          test: /[\\/]node_modules[\\/]vue(.*)[\\/]/,
+          chunks: "initial",
+          priority: 20,
+        },
+        libs: {
+          name: "chunk-libs",
+          test: /[\\/]node_modules[\\/]/,
+          priority: 10, // 权重最低，优先考虑前面内容
+          chunks: "initial",
+        },
+      },
     },
     // 提取runtime文件
     runtimeChunk: {
@@ -195,6 +234,10 @@ module.exports = {
   // webpack解析模块的时候加载的选项
   resolve: {
     extensions: [".jsx", ".js", ".json", ".vue"], // 自动补全文件扩展名
+    // 配置路径别名
+    alias: {
+      "@": path.resolve(__dirname, "../src"),
+    },
   },
 
   // webpack-dev-server配置开发服务器，不会输出资源，是在内存当中进行编译打包的
@@ -209,4 +252,6 @@ module.exports = {
     hot: true,
     historyApiFallback: true, // 解决路由刷新404问题
   },
+
+  performance: false, // 关闭性能分析，提高打包速度
 };

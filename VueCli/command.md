@@ -20,6 +20,8 @@ npm i @babel/eslint-parser@7.17.0 -D
 npm i eslint-plugin-vue@8.7.1 -D
 npm i @vue/cli-plugin-babel@5.0.4 -D
 npm i cross-env@7.0.3 -D
+npm i 'unplugin-auto-import@0.7.1' -D
+npm i unplugin-vue-components@0.19.3 -D
 ```
 
 # 生产依赖
