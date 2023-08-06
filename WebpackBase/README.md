@@ -26,7 +26,7 @@
 ```js
 // 安装教程当中的版本
 npm i webpack@5.72.0 -D
-npm i webpack-cli@4.9.2 -D
+npm i webpack-cli@4.10.0 -D
 
 // 执行打包【未配置webpack.config.js】
 npx webpack ./src/main.js --mode=development
