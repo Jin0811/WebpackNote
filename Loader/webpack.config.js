@@ -40,6 +40,14 @@ module.exports = {
           author: "张三",
         },
       },
+      // 自定义的babel-loader
+      {
+        test: /\.js$/,
+        loader: "./loaders/07_babel_loader.js",
+        options: {
+          presets: ["@babel/preset-env"],
+        },
+      },
     ],
   },
 
