@@ -30,10 +30,15 @@ module.exports = {
 
           // 清除console.log();
           "./loaders/05_clean_log_loader.js",
-
-          // 
-          "./loaders/06_banner_loader.js",
         ],
+      },
+      // 自动添加注释的loader
+      {
+        test: /\.js$/,
+        loader: "./loaders/06_banner_loader.js",
+        options: {
+          author: "张三",
+        },
       },
     ],
   },
