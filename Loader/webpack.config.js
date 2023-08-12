@@ -48,6 +48,21 @@ module.exports = {
           presets: ["@babel/preset-env"],
         },
       },
+      // file_loader
+      {
+        test: /\.(png|jpe?g|gif|webp)$/,
+        loader: "./loaders/08_file_loader.js",
+        type: "javascript/auto", // 解决图片重复打包问题，即阻止webpack默认处理图片资源的行为
+      },
+      // 样式相关loader
+      {
+        test: /\.css$/i, // 只检测.css文件
+        // loader的执行顺序是：从右到左（从下到上），先css-loader，再style-loader
+        use: [
+          "style-loader", // style-loader将js中的css通过创建style标签的形式添加到页面当中
+          "css-loader", // css-loader会将css资源编译成commonjs的一个模块到js当中
+        ],
+      },
     ],
   },
 

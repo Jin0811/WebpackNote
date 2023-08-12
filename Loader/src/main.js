@@ -1,3 +1,5 @@
+import "./css/index.css";
+
 console.log("main.js");
 
 const sum = (...args) => {
