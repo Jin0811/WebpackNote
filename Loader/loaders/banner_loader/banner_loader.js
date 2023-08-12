@@ -1,4 +1,4 @@
-const schema = require("./06_schema.json");
+const schema = require("./schema.json");
 
 module.exports = function (content) {
   // 获取配置项 const options = this.getOptions(schema);

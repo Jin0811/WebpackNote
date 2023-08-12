@@ -1,4 +1,4 @@
-const schema = require("./07_schema.json");
+const schema = require("./schema.json");
 const babel = require("@babel/core");
 
 module.exports = function (content) {
