@@ -7,6 +7,9 @@ module.exports = function (content) {
   const callback = this.async();
   // 使用babel对js代码进行编译
   babel.transform(content, options, function (err, result) {
-    callback(err, result.code);
+    if (err) {
+      callback(err);
+    }
+    callback(null, result.code);
   });
 };
