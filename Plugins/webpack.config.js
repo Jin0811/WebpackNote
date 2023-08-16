@@ -5,6 +5,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const BannerWebpackPlugin = require("./plugins/BannerWebpackPlugin");
 const CleanWebpackPlugin = require("./plugins/CleanWebpackPlugin");
 const AnalyzeWebpackPlugin = require("./plugins/AnalyzeWebpackPlugin");
+const InlineChunkWebpackPlugin = require("./plugins/InlineChunkWebpackPlugin");
 
 module.exports = {
   // 模式 mode
@@ -39,5 +40,16 @@ module.exports = {
     new BannerWebpackPlugin({ author: "张三" }),
     new CleanWebpackPlugin(),
     new AnalyzeWebpackPlugin(),
+    new InlineChunkWebpackPlugin([/runtime(.*)\.js$/g]),
   ],
+
+  optimization: {
+    splitChunks: {
+      chunks: "all", // 对所有模块都进行分割
+    },
+    // 提取runtime文件
+    runtimeChunk: {
+      name: (entrypoint) => `runtime~${entrypoint.name}`, // runtime文件命名规则
+    },
+  },
 };
