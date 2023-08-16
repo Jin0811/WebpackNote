@@ -4,6 +4,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 // const TestPlugin = require("./plugins/TestPlugin");
 const BannerWebpackPlugin = require("./plugins/BannerWebpackPlugin");
 const CleanWebpackPlugin = require("./plugins/CleanWebpackPlugin");
+const AnalyzeWebpackPlugin = require("./plugins/AnalyzeWebpackPlugin");
 
 module.exports = {
   // 模式 mode
@@ -37,5 +38,6 @@ module.exports = {
     // new TestPlugin(),
     new BannerWebpackPlugin({ author: "张三" }),
     new CleanWebpackPlugin(),
+    new AnalyzeWebpackPlugin(),
   ],
 };
